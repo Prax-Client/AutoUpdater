@@ -1,6 +1,4 @@
 ﻿using AutoUpdate.Models;
-using AutoUpdate.Resolvers;
-using AutoUpdate.Resolvers.Impl;
 using AutoUpdate.Structs;
 using AutoUpdate.Utility;
 
@@ -25,6 +23,7 @@ namespace AutoUpdate
                                             /
                               """);
             
+            
             if (!ConfigParser.IsConfigValid())
             {
                 // Delete it if it exists
@@ -32,18 +31,24 @@ namespace AutoUpdate
                 {
                     File.Delete(Environment.CurrentDirectory + "\\config.json");
                 }
-                Console.WriteLine("Config file not found. Creating one...");
+                Console.WriteLine("Creating config...");
                 ConfigParser.SetupConfig();
             } else
             {
-                Console.WriteLine("Config file found. Loading...");
+                Console.WriteLine("Loading config...");
                 Config = ConfigParser.LoadConfig();
             }
 
             // Try to print out the version 
             try
             {
-                Console.WriteLine($"Version: {Misc.GetVersion()}");
+                string folderName = Misc.DownloadLatest().Result;
+                Console.WriteLine($"Version: {folderName}");
+                
+                Config.PdbFile = $"{Config.WorkingDirectory}\\{folderName}\\bedrock_server.pdb";
+                Config.ExeFile = $"{Config.WorkingDirectory}\\{folderName}\\bedrock_server.exe";
+                
+                ConfigParser.SaveConfig();
             }
             catch (Exception)
             {

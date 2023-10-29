@@ -85,19 +85,8 @@ public class ConfigParser
             Program.Config.DemangleUtil = Console.ReadLine();
         }
         
-        Console.Write("Enter the directory of the server executable: ");
+        Console.Write("Enter the directory you wish to download the server to: ");
         Program.Config.WorkingDirectory = Console.ReadLine();
-        
-        Program.Config.PdbFile = Program.Config.WorkingDirectory + "\\bedrock_server.pdb";
-        Program.Config.ExeFile = Program.Config.WorkingDirectory + "\\bedrock_server.exe";
-        
-        if (!File.Exists(Program.Config.ExeFile) || !File.Exists(Program.Config.PdbFile))
-        {
-            Console.WriteLine("No executable found. Please ensure that both the pdb file and exist and are in the correct directory.");
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
-            Environment.Exit(0);
-        }
         
         // Create a new update item for an example
         UpdateItem example = new()

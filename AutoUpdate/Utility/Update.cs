@@ -54,6 +54,11 @@ public class Update
 
             int offset = item.Resolver.Resolve(function.Bytes);
             
+            if (offset == -1)
+            {
+                Console.WriteLine("Resolver failed.");
+                continue;
+            }
             
             //Console.WriteLine($"Offset: {offset}");
             // Read 4 bytes at the offset

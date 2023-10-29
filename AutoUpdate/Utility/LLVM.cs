@@ -8,11 +8,11 @@ public class LLVM
     public static Dictionary<string, PublicSymbol> DumpPublics()
     {
         Console.WriteLine("Dumping public symbols...");
-        Misc.RunProcess(Program.Config.PdbUtil, $"dump --publics \"{Program.Config.PdbFile}\" > \"{Program.Config.WorkingDirectory}publics.txt\"");
+        Misc.RunProcess(Program.Config.PdbUtil, $"dump --publics \"{Program.Config.PdbFile}\" > \"{Program.Config.WorkingDirectory}\\publics.txt\"");
         
                 string pattern = @"(\d+) \| (\S+) \[size = (\d+)\] `([^`]+)`\s+flags = ([^,]+), addr = ([\d:]+)";
 
-        MatchCollection publicsMatches = Regex.Matches(File.ReadAllText($"{Program.Config.WorkingDirectory}publics.txt"), pattern, RegexOptions.Multiline);
+        MatchCollection publicsMatches = Regex.Matches(File.ReadAllText($"{Program.Config.WorkingDirectory}\\publics.txt"), pattern, RegexOptions.Multiline);
 
         Dictionary<string, PublicSymbol> publicSymbolsDict = new Dictionary<string, PublicSymbol>();
             
@@ -36,12 +36,12 @@ public class LLVM
     public static List<Section> DumpSections()
     {
         Console.WriteLine("Dumping sections...");
-        Misc.RunProcess(Program.Config.PdbUtil, $"dump --section-headers \"{Program.Config.PdbFile}\" > \"{Program.Config.WorkingDirectory}sections.txt\"");
+        Misc.RunProcess(Program.Config.PdbUtil, $"dump --section-headers \"{Program.Config.PdbFile}\" > \"{Program.Config.WorkingDirectory}\\sections.txt\"");
 
         List<Section> sections = new List<Section>();
             
         // Get the sections
-        string sectionsInput = File.ReadAllText($"{Program.Config.WorkingDirectory}sections.txt");
+        string sectionsInput = File.ReadAllText($"{Program.Config.WorkingDirectory}\\sections.txt");
             
         // Define a regular expression pattern to match section headers and their properties
         string sectionPattern = @"SECTION HEADER #\d+([\s\S]*?)(?=SECTION HEADER #|\z)";            // Create a regular expression object
