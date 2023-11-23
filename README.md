@@ -1,4 +1,4 @@
-# AutoUpdater Readme
+# AutoUpdater
 
 ## Overview
 
