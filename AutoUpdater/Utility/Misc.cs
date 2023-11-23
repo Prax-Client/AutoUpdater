@@ -229,4 +229,14 @@ public class Misc
     {
         return "Unknown";
     }
+
+    public static void DrawASCII()
+    {
+        Console.WriteLine("""
+                              \          |            |  |          |         |
+                             _ \   |  |   _|   _ \    |  | _ \   _` |   _` |   _|   -_)   _|
+                           _/  _\ \_,_| \__| \___/   \__/ .__/ \__,_| \__,_| \__| \___| _|
+                                                         _|
+                          """);
+    }
 }

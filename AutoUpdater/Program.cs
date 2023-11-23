@@ -14,13 +14,8 @@ namespace AutoUpdater
         {
             Console.Title = "Auto Updater";
             Console.ForegroundColor = ConsoleColor.DarkCyan;
-            
-            Console.WriteLine("""
-                                  \          |            |  |          |         |              
-                                 _ \   |  |   _|   _ \    |  | _ \   _` |   _` |   _|   -_)   _| 
-                               _/  _\ \_,_| \__| \___/   \__/ .__/ \__,_| \__,_| \__| \___| _|   
-                                                             _|                                  
-                              """);
+
+            Misc.DrawASCII();
             
             
             if (!ConfigParser.IsConfigValid())
@@ -41,7 +36,7 @@ namespace AutoUpdater
             Console.WriteLine("Download latest version? (Y/n)");
             string? input = Console.ReadLine();
 
-            if (input!.ToLower().Contains("n"))
+            if (!input!.ToLower().Contains("n"))
             {
                 
                 // Try to print out the version 
@@ -70,12 +65,18 @@ namespace AutoUpdater
                 
                 ConfigParser.SaveConfig();
             }
-            
-            
+
+            Console.Clear();
+            Misc.DrawASCII();
+
             PublicSymbolsDict = LLVM.DumpPublics();
             Sections = LLVM.DumpSections();
-
+            
             Dictionary<string, int> offsets = Update.UpdateFromConfig(Config);
+            
+            
+            Console.Clear();
+            Misc.DrawASCII();
             
             Console.WriteLine("==========================================");
             
