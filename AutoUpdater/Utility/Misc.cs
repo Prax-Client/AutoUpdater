@@ -6,8 +6,9 @@ using AutoUpdater.Models;
 
 namespace AutoUpdater.Utility;
 
-public class Misc
+public static class Misc
 {
+    private static HttpClient? _client;
     
     public static void RunProcess(string? filename, string arguments)
     {
@@ -60,13 +61,13 @@ public class Misc
     {
         try
         {
+            const string edition = "win";
+            const string url = "https://www.minecraft.net/en-us/download/server/bedrock/";
             
-            string edition = "win";
-
-            string url = $"https://www.minecraft.net/en-us/download/server/bedrock/";
-            HttpClient client = new();
-            // Set the timeout for the http client to 5 seconds
-            client.Timeout = TimeSpan.FromSeconds(30);
+            _client ??= new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(30)
+            };
 
             HttpRequestMessage request = new(HttpMethod.Get, url);
 
@@ -77,7 +78,7 @@ public class Misc
             request.Headers.Add("Accept-Encoding", "gzip, deflate, br");
             request.Headers.Add("Accept-Language", "en-US,en;q=0.9");
 
-            HttpResponseMessage response = await client.SendAsync(request);
+            var response = await _client.SendAsync(request);
 
             // This content is likely compressed, so we will need to decompress it
             // We can do this by using the GZipStream class
@@ -92,24 +93,18 @@ public class Misc
             
             // Decompress the response
             // Create a new GZipStream
-            GZipStream gzipStream = new(response.Content.ReadAsStream(), CompressionMode.Decompress);
+            GZipStream gzipStream = new(await response.Content.ReadAsStreamAsync(), CompressionMode.Decompress);
             // Create a new StreamReader
             StreamReader reader = new(gzipStream, Encoding.UTF8);
             // Read the response
-            string decompressedResponse = await reader.ReadToEndAsync();
+            var decompressedResponse = await reader.ReadToEndAsync();
             // Close the reader
             reader.Close();
             // Close the GZipStream
             gzipStream.Close();
             
-
-            if (edition is not "win" and not "linux" and not "win-preview" and not "linux-preview") 
-            {
-                Console.WriteLine("Invalid edition.");
-                return "Unknown";
-            }
-            
-            string link = Regex.Match(decompressedResponse, $@"https://minecraft.azureedge.net/bin-{edition.ToLower()}/bedrock-server-\d+\.\d+\.\d+\.\d+\.zip").Value;
+            var link = Regex.Match(decompressedResponse, 
+                $@"https://minecraft.azureedge.net/bin-{edition.ToLower()}/bedrock-server-\d+\.\d+\.\d+\.\d+\.zip").Value;
                 
             // Check if the link is empty
             if (link.Length == 0)
@@ -120,19 +115,16 @@ public class Misc
                 
             // Download the file
             Console.WriteLine("Downloading...");
-            client = new();
-            // Set the timeout for the http client to 5 seconds
-            client.Timeout = TimeSpan.FromSeconds(30);
             
             // Create a new request
-            request = new(HttpMethod.Get, link);
+            request = new HttpRequestMessage(HttpMethod.Get, link);
             
             // Add the user agent header to look like a normal browser
             request.Headers.Add("User-Agent",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/119.0");
             
             // Send the request
-            response = await client.SendAsync(request);
+            response = await _client.SendAsync(request);
             
             // Check if the response was successful first
             if (!response.IsSuccessStatusCode)
@@ -142,7 +134,7 @@ public class Misc
             }
             
             // Get the file name
-            string fileName = Regex.Match(link, @"bedrock-server-\d+\.\d+\.\d+\.\d+").Value;
+            var fileName = Regex.Match(link, @"bedrock-server-\d+\.\d+\.\d+\.\d+").Value;
 
             if (Directory.Exists(Program.Config.WorkingDirectory + "\\" + fileName))
                 return fileName;
@@ -160,7 +152,8 @@ public class Misc
             
             // Unzip
             Console.WriteLine("Unzipping...");
-            ZipFile.ExtractToDirectory(Program.Config.WorkingDirectory + "\\" + fileName + ".zip", Program.Config.WorkingDirectory + "\\" + fileName);
+            ZipFile.ExtractToDirectory(Program.Config.WorkingDirectory + "\\" + fileName + ".zip", 
+                Program.Config.WorkingDirectory + "\\" + fileName);
             Console.WriteLine("Unzipped.");
             
             // Delete the zip file
@@ -181,18 +174,18 @@ public class Misc
         var nextFunctionAddress = FindNextLowestAddress(symbol)!.Value.Address;
             
         // Load the exe into a byte array
-        byte[] exeBytes = File.ReadAllBytes(Program.Config.ExeFile!);
+        var exeBytes = File.ReadAllBytes(Program.Config.ExeFile!);
             
         // Get the offset of the section
-        int sectionOffset = int.Parse(section.FilePointerToRawData, System.Globalization.NumberStyles.HexNumber);
+        var sectionOffset = int.Parse(section.FilePointerToRawData, System.Globalization.NumberStyles.HexNumber);
             
         // Get the offset of the public symbol in the exe
-        int publicOffsetInExe = sectionOffset + symbol.Address;
+        var publicOffsetInExe = sectionOffset + symbol.Address;
             
         var functionSize = nextFunctionAddress - symbol.Address;
             
         // Read first 4 bytes of the public symbol
-        byte[] publicFunctionBytes = new byte[functionSize];
+        var publicFunctionBytes = new byte[functionSize];
         Array.Copy(exeBytes, publicOffsetInExe, publicFunctionBytes, 0, publicFunctionBytes.Length);
         
         return new Function()
@@ -201,14 +194,13 @@ public class Misc
             Address = (ulong) publicOffsetInExe
         };
     }
-    
-    
-    
-    public static PublicSymbol? FindNextLowestAddress(PublicSymbol currentSymbol)
+
+
+    private static PublicSymbol? FindNextLowestAddress(PublicSymbol currentSymbol)
     {
         // Go through ALL the public symbols (Since its not sorted at all) and find the lowest address more than the current symbol's address
 
-        PublicSymbol currentSmallest = new PublicSymbol()
+        var currentSmallest = new PublicSymbol
         {
             Address = int.MaxValue
         };

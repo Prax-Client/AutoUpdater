@@ -2,7 +2,7 @@
 
 public class OffsetResolver : Resolver
 {
-    public override int Resolve(byte[] bytes)
+    public override int Resolve(byte[] haystack)
     {
         return int.Parse(Value);
     }
