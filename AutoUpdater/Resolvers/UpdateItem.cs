@@ -1,4 +1,4 @@
-﻿namespace AutoUpdate.Resolvers;
+﻿namespace AutoUpdater.Resolvers;
 
 public class UpdateItem
 {

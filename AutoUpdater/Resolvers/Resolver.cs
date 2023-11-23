@@ -1,6 +1,6 @@
-﻿using AutoUpdate.Utility;
+﻿using AutoUpdater.Utility;
 
-namespace AutoUpdate.Resolvers;
+namespace AutoUpdater.Resolvers;
 
 public enum ResolverType
 {

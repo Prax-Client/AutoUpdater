@@ -2,9 +2,9 @@
 using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
-using AutoUpdate.Structs;
+using AutoUpdater.Models;
 
-namespace AutoUpdate.Utility;
+namespace AutoUpdater.Utility;
 
 public class Misc
 {
@@ -32,7 +32,7 @@ public class Misc
         cmd.WaitForExit();
     }
 
-    public static string RunProcessAndGetOutput(string filename, string arguments)
+    public static string RunProcessAndGetOutput(string? filename, string arguments)
     {
         if (!File.Exists(filename))
         {
@@ -181,7 +181,7 @@ public class Misc
         var nextFunctionAddress = FindNextLowestAddress(symbol)!.Value.Address;
             
         // Load the exe into a byte array
-        byte[] exeBytes = File.ReadAllBytes(Program.Config.ExeFile);
+        byte[] exeBytes = File.ReadAllBytes(Program.Config.ExeFile!);
             
         // Get the offset of the section
         int sectionOffset = int.Parse(section.FilePointerToRawData, System.Globalization.NumberStyles.HexNumber);

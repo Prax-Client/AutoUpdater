@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using AutoUpdate.Structs;
+using AutoUpdater.Models;
 
-namespace AutoUpdate.Utility;
+namespace AutoUpdater.Utility;
 
 public class LLVM
 {

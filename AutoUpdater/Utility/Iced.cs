@@ -1,6 +1,6 @@
 ﻿using Iced.Intel;
 
-namespace AutoUpdate.Utility;
+namespace AutoUpdater.Utility;
 
 sealed class SymbolResolver : ISymbolResolver {
     readonly Dictionary<ulong, string> symbolDict;

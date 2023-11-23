@@ -1,4 +1,4 @@
-﻿namespace AutoUpdate.Structs;
+﻿namespace AutoUpdater.Models;
 
 public struct Function
 {

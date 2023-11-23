@@ -1,4 +1,4 @@
-﻿namespace AutoUpdate.Resolvers.Impl;
+﻿namespace AutoUpdater.Resolvers.Impl;
 
 public class PatternResolver : Resolver
 {

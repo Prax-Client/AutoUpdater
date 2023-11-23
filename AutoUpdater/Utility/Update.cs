@@ -1,9 +1,8 @@
-﻿using AutoUpdate.Models;
-using AutoUpdate.Resolvers;
-using AutoUpdate.Resolvers.Impl;
-using AutoUpdate.Structs;
+﻿using AutoUpdater.Models;
+using AutoUpdater.Resolvers;
+using AutoUpdater.Resolvers.Impl;
 
-namespace AutoUpdate.Utility;
+namespace AutoUpdater.Utility;
 
 public class Update
 {

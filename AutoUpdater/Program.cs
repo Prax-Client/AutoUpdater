@@ -1,8 +1,7 @@
-﻿using AutoUpdate.Models;
-using AutoUpdate.Structs;
-using AutoUpdate.Utility;
+﻿using AutoUpdater.Models;
+using AutoUpdater.Utility;
 
-namespace AutoUpdate 
+namespace AutoUpdater 
 {
     internal class Program
     {
@@ -40,9 +39,9 @@ namespace AutoUpdate
             }
             
             Console.WriteLine("Download latest version? (Y/n)");
-            string input = Console.ReadLine();
+            string? input = Console.ReadLine();
 
-            if (!input.ToLower().Contains("n"))
+            if (input!.ToLower().Contains("n"))
             {
                 
                 // Try to print out the version 
@@ -64,7 +63,7 @@ namespace AutoUpdate
             else
             {
                 Console.Write("Enter folder name (Must be in the working directory):");
-                string folderName = Console.ReadLine();
+                string? folderName = Console.ReadLine();
                 
                 Config.PdbFile = $"{Config.WorkingDirectory}\\{folderName}\\bedrock_server.pdb";
                 Config.ExeFile = $"{Config.WorkingDirectory}\\{folderName}\\bedrock_server.exe";
