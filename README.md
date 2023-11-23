@@ -22,13 +22,13 @@ AutoUpdater is a C# project designed to simplify the process of updating cheat o
 ## Features
 
 - **Automatic Updates:** Automatically downloads the latest MCBE Windows server executable.
-- **Offset Analysis:** Analyzes the downloaded server executable to identify and update cheat offsets.
+- **Offset Analysis:** Analyzes the downloaded server executable to identify and update offsets.
 - **Configuration File:** Utilizes a configuration file to specify and update offsets according to the user's needs.
 
 ## Requirements
 
 - **Operating System:** Windows
-- **LLVM:** MSYS2 (Contains name demangler and allows for public and section dumping)
+- **LLVM:** [MSYS2](https://www.msys2.org/) (Contains name demangler and allows for public and section dumping) (Contains name demangler and allows for public and section dumping)
 ## Installation
 
 1. Clone the repository:
