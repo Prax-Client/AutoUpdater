@@ -25,7 +25,7 @@ jobs:
     - name: Add submodule
       run: git submodule update --recursive --remote --force
     - name: Publish
-      run: dotnet publish AutoUpdater.csproj -o build\ -c Release -p:PublishTrimmed=true -p:PublishSingleFile=true -p:SelfContained=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true
+      run: dotnet publish AutoUpdater/AutoUpdater.csproj -o build\ -c Release -p:PublishTrimmed=true -p:PublishSingleFile=true -p:SelfContained=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true
     - name: Release with Notes
       uses: softprops/action-gh-release@v1
       with:
