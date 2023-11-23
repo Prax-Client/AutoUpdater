@@ -1,6 +1,6 @@
 ﻿using AutoUpdater.Resolvers;
 
-namespace AutoUpdater.Models;
+namespace AutoUpdater.Configs;
 
 public class Config
 {

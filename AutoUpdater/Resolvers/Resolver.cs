@@ -24,8 +24,8 @@ public class Resolver
         Value = value;
     }
     
-    public virtual int Resolve(byte[] bytes)
+    public virtual int Resolve(byte[] haystack)
     {
-        return -1;
+        throw new NotImplementedException();
     }
 }

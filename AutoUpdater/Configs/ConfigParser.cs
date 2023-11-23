@@ -1,38 +1,37 @@
-﻿using AutoUpdater.Models;
-using AutoUpdater.Resolvers;
+﻿using AutoUpdater.Resolvers;
 using AutoUpdater.Resolvers.Impl;
+using Newtonsoft.Json;
 
-namespace AutoUpdater.Utility;
+namespace AutoUpdater.Configs;
 
-public class ConfigParser
+public static class ConfigParser
 {
-    public static Models.Config LoadConfig()
+    public static Config LoadConfig()
     {
         // Load json file
         var json = File.ReadAllText(Environment.CurrentDirectory + "\\config.json");
         // Deserialize json
-        var config = Newtonsoft.Json.JsonConvert.DeserializeObject<Models.Config>(json);
+        var config = JsonConvert.DeserializeObject<Config>(json);
         // Return config
         
         // Make sure to convert all the resolvers to the correct type
         foreach (var updateItem in config!.UpdateItems)
         {
-            if (updateItem.Resolver.Type == ResolverType.Offset)
+            updateItem.Resolver = updateItem.Resolver.Type switch
             {
-                updateItem.Resolver = new OffsetResolver(updateItem.Resolver.Value);
-            } else if (updateItem.Resolver.Type == ResolverType.Pattern)
-            {
-                updateItem.Resolver = new PatternResolver(updateItem.Resolver.Value);
-            }
+                ResolverType.Offset => new OffsetResolver(updateItem.Resolver.Value),
+                ResolverType.Pattern => new PatternResolver(updateItem.Resolver.Value),
+                _ => updateItem.Resolver
+            };
         }
         
-        return config!;
+        return config;
     }
 
     public static void SaveConfig()
     {
         // Serialize config
-        var json = Newtonsoft.Json.JsonConvert.SerializeObject(Program.Config, Newtonsoft.Json.Formatting.Indented);
+        var json = JsonConvert.SerializeObject(Program.Config, Formatting.Indented);
         // Write to file
         File.WriteAllText(Environment.CurrentDirectory + "\\config.json", json);
     }

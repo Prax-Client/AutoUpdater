@@ -4,26 +4,26 @@ using AutoUpdater.Resolvers.Impl;
 
 namespace AutoUpdater.Utility;
 
-public class Update
+public static class Update
 {
-    public static Dictionary<string, int> UpdateFromConfig(Models.Config config)
+    public static Dictionary<string, int> UpdateFromConfig(Configs.Config config)
     {
         Dictionary<string, int> offsets = new();
         
         foreach (var item in config.UpdateItems)
         {
-
-            PublicSymbol symbol;
             
-            try
-            {
-                
-                symbol =
-                    Program.PublicSymbolsDict[
-                        item.Function
-                    ]; // ??_7Actor@@6B@ is the public symbol for the Actor class's destructor
+            // try
+            // {
+            //     // ??_7Actor@@6B@ is the public symbol for the Actor class's destructor
+            //     symbol = Program.PublicSymbolsDict[item.Function];
+            // } catch (KeyNotFoundException)
+            // {
+            //     Console.WriteLine($"Function {item.Function} not found.");
+            //     continue;
+            // }
 
-            } catch (KeyNotFoundException)
+            if (!Program.PublicSymbolsDict.TryGetValue(item.Function, out var symbol))
             {
                 Console.WriteLine($"Function {item.Function} not found.");
                 continue;
@@ -31,7 +31,7 @@ public class Update
             
             // string section index = 0002:1908168 (the 0002 is the section index)
             
-            Section section = Program.Sections.Find(x => x.Index == symbol.SectionIndex);
+            var section = Program.Sections.Find(x => x.Index == symbol.SectionIndex);
             
             Console.WriteLine("==========================================");
             
@@ -53,7 +53,7 @@ public class Update
             //Console.WriteLine($"Bytes: {BitConverter.ToString(function.Bytes)}");
             //Iced.OutputAsm(function.Bytes, function.Address);
 
-            int offset = item.Resolver.Resolve(function.Bytes);
+            var offset = item.Resolver.Resolve(function.Bytes);
             
             if (offset == -1)
             {
@@ -63,11 +63,11 @@ public class Update
             
             //Console.WriteLine($"Offset: {offset}");
             // Read 4 bytes at the offset
-            byte[] offsetBytes = new byte[4];
+            var offsetBytes = new byte[4];
             Array.Copy(function.Bytes, offset, offsetBytes, 0, offsetBytes.Length);
             
             // Convert the bytes to an int
-            int offsetInt = BitConverter.ToInt32(offsetBytes, 0);
+            var offsetInt = BitConverter.ToInt32(offsetBytes, 0);
             
             // Write as hex
             Console.WriteLine($"{item.Name}: {offsetInt:X}");

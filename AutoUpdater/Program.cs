@@ -1,23 +1,25 @@
-﻿using AutoUpdater.Models;
+﻿using AutoUpdater.Configs;
+using AutoUpdater.Models;
 using AutoUpdater.Utility;
 
-namespace AutoUpdater 
+namespace AutoUpdater;
+
+internal static class Program
 {
-    internal class Program
+    public static Config Config = new();
+        
+    public static Dictionary<string, PublicSymbol> PublicSymbolsDict = new();
+    public static List<Section> Sections = new();
+
+    private static async Task Main()
     {
-        public static Models.Config Config = new Models.Config();
-        
-        public static Dictionary<string, PublicSymbol> PublicSymbolsDict = new Dictionary<string, PublicSymbol>();
-        public static List<Section> Sections = new List<Section>();
-        
-        static void Main()
+        while (true)
         {
             Console.Title = "Auto Updater";
             Console.ForegroundColor = ConsoleColor.DarkCyan;
 
             Misc.DrawASCII();
-            
-            
+
             if (!ConfigParser.IsConfigValid())
             {
                 // Delete it if it exists
@@ -25,29 +27,30 @@ namespace AutoUpdater
                 {
                     File.Delete(Environment.CurrentDirectory + "\\config.json");
                 }
+
                 Console.WriteLine("Creating config...");
                 ConfigParser.SetupConfig();
-            } else
+            }
+            else
             {
                 Console.WriteLine("Loading config...");
                 Config = ConfigParser.LoadConfig();
             }
-            
-            Console.WriteLine("Download latest version? (Y/n)");
-            string? input = Console.ReadLine();
 
-            if (!input!.ToLower().Contains("n"))
+            Console.WriteLine("Download latest version? (Y/n)");
+            var input = Console.ReadLine();
+
+            if (!input!.ToLower().Contains('n'))
             {
-                
                 // Try to print out the version 
                 try
                 {
-                    string folderName = Misc.DownloadLatest().Result;
+                    var folderName = await Misc.DownloadLatest();
                     Console.WriteLine($"Version: {folderName}");
-                
-                    Config.PdbFile = $"{Config.WorkingDirectory}\\{folderName}\\bedrock_server.pdb";
-                    Config.ExeFile = $"{Config.WorkingDirectory}\\{folderName}\\bedrock_server.exe";
-                
+
+                    Config.PdbFile = $@"{Config.WorkingDirectory}\{folderName}\bedrock_server.pdb";
+                    Config.ExeFile = $@"{Config.WorkingDirectory}\{folderName}\bedrock_server.exe";
+
                     ConfigParser.SaveConfig();
                 }
                 catch (Exception)
@@ -57,12 +60,12 @@ namespace AutoUpdater
             }
             else
             {
-                Console.Write("Enter folder name (Must be in the working directory):");
-                string? folderName = Console.ReadLine();
-                
-                Config.PdbFile = $"{Config.WorkingDirectory}\\{folderName}\\bedrock_server.pdb";
-                Config.ExeFile = $"{Config.WorkingDirectory}\\{folderName}\\bedrock_server.exe";
-                
+                Console.Write("Enter a folder name (Must be in the working directory):");
+                var folderName = Console.ReadLine();
+
+                Config.PdbFile = $@"{Config.WorkingDirectory}\{folderName}\bedrock_server.pdb";
+                Config.ExeFile = $@"{Config.WorkingDirectory}\{folderName}\bedrock_server.exe";
+
                 ConfigParser.SaveConfig();
             }
 
@@ -71,35 +74,34 @@ namespace AutoUpdater
 
             PublicSymbolsDict = LLVM.DumpPublics();
             Sections = LLVM.DumpSections();
-            
-            Dictionary<string, int> offsets = Update.UpdateFromConfig(Config);
-            
-            
+
+            var offsets = Update.UpdateFromConfig(Config);
+
+
             Console.Clear();
             Misc.DrawASCII();
-            
+
             Console.WriteLine("==========================================");
-            
+
             Console.WriteLine("Offsets:");
             foreach (var offset in offsets)
             {
-                Console.WriteLine($"{offset.Key}: 0x{offset.Value.ToString("X")}");
+                Console.WriteLine($"{offset.Key}: 0x{offset.Value:X}");
             }
-            
+
             Console.WriteLine("==========================================");
-            
+
             // Export to file
             Console.WriteLine("Exporting to file...");
-            if (Config.OutputFile != null)
-                File.WriteAllText(Config.OutputFile,
-                    string.Join("\n", offsets.Select(x => $"{x.Key}=0x{x.Value.ToString("X")}")));
+            
+            if (Config.OutputFile != null) 
+                await File.WriteAllTextAsync(Config.OutputFile, 
+                    string.Join("\n", offsets.Select(x => $"{x.Key}=0x{x.Value:X}")));
 
-            Console.WriteLine("Done.");
+            Console.WriteLine("Done. Press enter to start again.");
 
             Console.ReadLine();
             Console.Clear();
-            
-            Main();
         }
     }
 }
