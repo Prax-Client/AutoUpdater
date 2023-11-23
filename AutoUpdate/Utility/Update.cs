@@ -7,8 +7,10 @@ namespace AutoUpdate.Utility;
 
 public class Update
 {
-    public static void UpdateFromConfig(ConfigModel config)
+    public static Dictionary<string, int> UpdateFromConfig(Models.Config config)
     {
+        Dictionary<string, int> offsets = new();
+        
         foreach (var item in config.UpdateItems)
         {
 
@@ -70,6 +72,10 @@ public class Update
             
             // Write as hex
             Console.WriteLine($"{item.Name}: {offsetInt:X}");
+            
+            offsets.Add(item.Name, offsetInt);
         }
+        
+        return offsets;
     }
 }

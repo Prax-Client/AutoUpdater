@@ -6,12 +6,12 @@ namespace AutoUpdate.Utility;
 
 public class ConfigParser
 {
-    public static ConfigModel LoadConfig()
+    public static Models.Config LoadConfig()
     {
         // Load json file
         var json = File.ReadAllText(Environment.CurrentDirectory + "\\config.json");
         // Deserialize json
-        var config = Newtonsoft.Json.JsonConvert.DeserializeObject<ConfigModel>(json);
+        var config = Newtonsoft.Json.JsonConvert.DeserializeObject<Models.Config>(json);
         // Return config
         
         // Make sure to convert all the resolvers to the correct type

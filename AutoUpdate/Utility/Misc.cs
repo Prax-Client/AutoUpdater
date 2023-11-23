@@ -66,7 +66,7 @@ public class Misc
             string url = $"https://www.minecraft.net/en-us/download/server/bedrock/";
             HttpClient client = new();
             // Set the timeout for the http client to 5 seconds
-            client.Timeout = TimeSpan.FromSeconds(5);
+            client.Timeout = TimeSpan.FromSeconds(30);
 
             HttpRequestMessage request = new(HttpMethod.Get, url);
 
@@ -122,7 +122,7 @@ public class Misc
             Console.WriteLine("Downloading...");
             client = new();
             // Set the timeout for the http client to 5 seconds
-            client.Timeout = TimeSpan.FromSeconds(5);
+            client.Timeout = TimeSpan.FromSeconds(30);
             
             // Create a new request
             request = new(HttpMethod.Get, link);
