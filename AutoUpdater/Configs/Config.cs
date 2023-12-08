@@ -2,7 +2,7 @@
 
 namespace AutoUpdater.Configs;
 
-public class Config
+public class Preferences
 {
     public string? WorkingDirectory;
     public string? PdbFile;
@@ -11,7 +11,16 @@ public class Config
     public string? PdbUtil;
     public string? DemangleUtil;
     public string? OutputFile = "output.txt";
+}
 
-    public List<UpdateItem> UpdateItems = new();
-    
+public class UpdateConfig
+{
+    public string? Author;
+    public List<UpdateItem> Items = new();
+}
+
+public class Config
+{
+    public Preferences? Preferences = new();
+    public UpdateConfig? SDK = new();
 }

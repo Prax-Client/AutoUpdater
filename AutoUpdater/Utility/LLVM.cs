@@ -8,12 +8,12 @@ public static class LLVM
     public static Dictionary<string, PublicSymbol> DumpPublics()
     {
         Console.WriteLine("Dumping public symbols...");
-        Misc.RunProcess(Program.Config.PdbUtil, 
-            $"dump --publics \"{Program.Config.PdbFile}\" > \"{Program.Config.WorkingDirectory}\\publics.txt\"");
+        Misc.RunProcess(Program.Config.Preferences.PdbUtil, 
+            $"dump --publics \"{Program.Config.Preferences.PdbFile}\" > \"{Program.Config.Preferences.WorkingDirectory}\\publics.txt\"");
         
         const string pattern = @"(\d+) \| (\S+) \[size = (\d+)\] `([^`]+)`\s+flags = ([^,]+), addr = ([\d:]+)";
 
-        var publicsMatches = Regex.Matches(File.ReadAllText($"{Program.Config.WorkingDirectory}\\publics.txt"), pattern, RegexOptions.Multiline);
+        var publicsMatches = Regex.Matches(File.ReadAllText($"{Program.Config.Preferences.WorkingDirectory}\\publics.txt"), pattern, RegexOptions.Multiline);
 
         var publicSymbolsDict = new Dictionary<string, PublicSymbol>();
             
@@ -37,12 +37,12 @@ public static class LLVM
     public static List<Section> DumpSections()
     {
         Console.WriteLine("Dumping sections...");
-        Misc.RunProcess(Program.Config.PdbUtil, $"dump --section-headers \"{Program.Config.PdbFile}\" > \"{Program.Config.WorkingDirectory}\\sections.txt\"");
+        Misc.RunProcess(Program.Config.Preferences.PdbUtil, $"dump --section-headers \"{Program.Config.Preferences.PdbFile}\" > \"{Program.Config.Preferences.WorkingDirectory}\\sections.txt\"");
 
         var sections = new List<Section>();
             
         // Get the sections
-        var sectionsInput = File.ReadAllText($"{Program.Config.WorkingDirectory}\\sections.txt");
+        var sectionsInput = File.ReadAllText($"{Program.Config.Preferences.WorkingDirectory}\\sections.txt");
             
         // Define a regular expression pattern to match section headers and their properties
         var sectionPattern = @"SECTION HEADER #\d+([\s\S]*?)(?=SECTION HEADER #|\z)";            // Create a regular expression object
@@ -77,7 +77,7 @@ public static class LLVM
     {
         try
         {
-            return Misc.RunProcessAndGetOutput(Program.Config.DemangleUtil, input).Split("\n")[5];
+            return Misc.RunProcessAndGetOutput(Program.Config.Preferences.DemangleUtil, input).Split("\n")[5];
         }
         catch (Exception)
         {

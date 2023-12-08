@@ -6,16 +6,30 @@ namespace AutoUpdater.Configs;
 
 public static class ConfigParser
 {
-    public static Config LoadConfig()
+    public static Config LoadConfigs()
     {
+        // Check is valid
+        if (!IsDumpValid() || !ArePreferencesValid())
+        {
+            throw new Exception("Config is not valid");
+        }
+
+        Config config = new();
+        
+        
+        
         // Load json file
-        var json = File.ReadAllText(Environment.CurrentDirectory + "\\config.json");
+        var prefJson = File.ReadAllText(Environment.CurrentDirectory + "\\preferences.json");
         // Deserialize json
-        var config = JsonConvert.DeserializeObject<Config>(json);
-        // Return config
+        config.Preferences = JsonConvert.DeserializeObject<Preferences>(prefJson);
+        
+        // Load json file
+        var dumpJson = File.ReadAllText(Environment.CurrentDirectory + "\\dump.json");
+        // Deserialize json
+        config.SDK = JsonConvert.DeserializeObject<UpdateConfig>(dumpJson);
         
         // Make sure to convert all the resolvers to the correct type
-        foreach (var updateItem in config!.UpdateItems)
+        foreach (var updateItem in config!.SDK.Items)
         {
             updateItem.Resolver = updateItem.Resolver.Type switch
             {
@@ -31,83 +45,82 @@ public static class ConfigParser
     public static void SaveConfig()
     {
         // Serialize config
-        var json = JsonConvert.SerializeObject(Program.Config, Formatting.Indented);
+        var prefJson = JsonConvert.SerializeObject(Program.Config.Preferences, Formatting.Indented);
         // Write to file
-        File.WriteAllText(Environment.CurrentDirectory + "\\config.json", json);
+        File.WriteAllText(Environment.CurrentDirectory + "\\preferences.json", prefJson);
+        
+        // Serialize config
+        var dumpJson = JsonConvert.SerializeObject(Program.Config.SDK, Formatting.Indented);
+        // Write to file
+        File.WriteAllText(Environment.CurrentDirectory + "\\dump.json", dumpJson);
     }
 
-    public static bool IsConfigValid()
+    public static bool ArePreferencesValid()
     {
         // Make sure the config file exists
-        if (!File.Exists(Environment.CurrentDirectory + "\\config.json"))
-        {
-            return false;
-        }
-        
+        return File.Exists(Environment.CurrentDirectory + "\\dump.json") && File.Exists(Environment.CurrentDirectory + "\\preferences.json");
+    }
+
+    public static bool IsDumpValid()
+    {
         // Make sure its not empty
-        if (new FileInfo(Environment.CurrentDirectory + "\\config.json").Length == 0)
-        {
-            return false;
-        }
-        
-        // Make sure the config is valid
-        try
-        {
-            LoadConfig();
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-        
-        return true;
+        return new FileInfo(Environment.CurrentDirectory + "\\dump.json").Length != 0 && new FileInfo(Environment.CurrentDirectory + "\\preferences.json").Length != 0;
     }
     
     public static void SetupConfig()
     {
-        Console.Write("Enter the directory of LLVM's installation: ");
-        Program.Config.LlvmInstallDirectory = Console.ReadLine();
         
-        Program.Config.PdbUtil = Program.Config.LlvmInstallDirectory + "\\llvm-pdbutil.exe";
-        Program.Config.DemangleUtil = Program.Config.LlvmInstallDirectory + "\\llvm-undname.exe";
-        
-        if (!File.Exists(Program.Config.PdbUtil))
+        if (!File.Exists("preferences.json") || File.ReadAllText("preferences.json") == "")
         {
-            Console.WriteLine("llvm-pdbutil.exe not found. Please enter the directory of llvm-pdbutil.exe:");
-            Program.Config.PdbUtil = Console.ReadLine();
+            Console.Write("Enter the directory of LLVM's installation: ");
+            Program.Config.Preferences!.LlvmInstallDirectory = Console.ReadLine();
+        
+            Program.Config.Preferences.PdbUtil = Program.Config.Preferences.LlvmInstallDirectory + "\\llvm-pdbutil.exe";
+            Program.Config.Preferences.DemangleUtil = Program.Config.Preferences.LlvmInstallDirectory + "\\llvm-undname.exe";
+        
+            if (!File.Exists(Program.Config.Preferences.PdbUtil))
+            {
+                Console.WriteLine("llvm-pdbutil.exe not found. Please enter the directory of llvm-pdbutil.exe:");
+                Program.Config.Preferences.PdbUtil = Console.ReadLine();
+            }
+        
+            if (!File.Exists(Program.Config.Preferences.DemangleUtil))
+            {
+                Console.WriteLine("llvm-undname.exe not found. Please enter the directory of llvm-undname.exe:");
+                Console.WriteLine("This file is usually installed when using MSYS2. If you do not have this file, you can install MSYS2 from https://www.msys2.org/");
+                Program.Config.Preferences.DemangleUtil = Console.ReadLine();
+            }
+        
+            Console.Write("Enter the directory you wish to download the server to: ");
+            Program.Config.Preferences.WorkingDirectory = Console.ReadLine();
         }
         
-        if (!File.Exists(Program.Config.DemangleUtil))
+        if (!File.Exists("dump.json") || File.ReadAllText("dump.json") == "")
         {
-            Console.WriteLine("llvm-undname.exe not found. Please enter the directory of llvm-undname.exe:");
-            Console.WriteLine("This file is usually installed when using MSYS2. If you do not have this file, you can install MSYS2 from https://www.msys2.org/");
-            Program.Config.DemangleUtil = Console.ReadLine();
+            
+        
+            // Create a new update item for an example
+            UpdateItem example = new()
+            {
+                Name = "Example Offset",
+                Function = "?getSupplies@Player@@QEBAAEBVPlayerInventory@@XZ",
+                Resolver = new OffsetResolver("3")
+            };
+        
+            // Add the example update item to the config
+            Program.Config.SDK.Items.Add(example);
+        
+            // Add pattern resolver example
+            UpdateItem example2 = new()
+            {
+                Name = "Example Pattern",
+                Function = "?getSupplies@Player@@QEBAAEBVPlayerInventory@@XZ",
+                Resolver = new PatternResolver("? ? ? ? C3")
+            };
+        
+            // Add the example update item to the config
+            Program.Config.SDK.Items.Add(example2);
         }
-        
-        Console.Write("Enter the directory you wish to download the server to: ");
-        Program.Config.WorkingDirectory = Console.ReadLine();
-        
-        // Create a new update item for an example
-        UpdateItem example = new()
-        {
-            Name = "Example Offset",
-            Function = "?getSupplies@Player@@QEBAAEBVPlayerInventory@@XZ",
-            Resolver = new OffsetResolver("3")
-        };
-        
-        // Add the example update item to the config
-        Program.Config.UpdateItems.Add(example);
-        
-        // Add pattern resolver example
-        UpdateItem example2 = new()
-        {
-            Name = "Example Pattern",
-            Function = "?getSupplies@Player@@QEBAAEBVPlayerInventory@@XZ",
-            Resolver = new PatternResolver("? ? ? ? C3")
-        };
-        
-        // Add the example update item to the config
-        Program.Config.UpdateItems.Add(example2);
         
         SaveConfig();
     }

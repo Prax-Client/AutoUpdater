@@ -17,15 +17,18 @@ public static class Misc
             throw new FileNotFoundException($"File not found: {filename}");
         }
         
-        Process cmd = new Process();
-        cmd.StartInfo.FileName = "cmd.exe";
-        cmd.StartInfo.Arguments = arguments;
-        cmd.StartInfo.RedirectStandardInput = true;
-        cmd.StartInfo.RedirectStandardOutput = true;
-        cmd.StartInfo.CreateNoWindow = false;
-        cmd.StartInfo.UseShellExecute = false;
+        var cmd = new Process {
+            StartInfo = {
+                FileName = "cmd.exe",
+                Arguments = arguments,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                CreateNoWindow = false,
+                UseShellExecute = false
+            }
+        };
         cmd.Start();
-
+        
         cmd.StandardInput.WriteLine($"\"{filename}\" {arguments}");
         cmd.StandardInput.Flush();
         cmd.StandardInput.Close();
@@ -40,13 +43,18 @@ public static class Misc
             throw new FileNotFoundException($"File not found: {filename}");
         }
         
-        Process cmd = new Process();
-        cmd.StartInfo.FileName = "cmd.exe";
-        cmd.StartInfo.Arguments = arguments;
-        cmd.StartInfo.RedirectStandardInput = true;
-        cmd.StartInfo.RedirectStandardOutput = true;
-        cmd.StartInfo.CreateNoWindow = false;
-        cmd.StartInfo.UseShellExecute = false;
+        var cmd = new Process()
+        {
+            StartInfo = {
+                FileName = "cmd.exe",
+                Arguments = arguments,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                CreateNoWindow = false,
+                UseShellExecute = false
+            }
+        };
+        
         cmd.Start();
         
         cmd.StandardInput.WriteLine($"\"{filename}\" {arguments}");
@@ -136,11 +144,11 @@ public static class Misc
             // Get the file name
             var fileName = Regex.Match(link, @"bedrock-server-\d+\.\d+\.\d+\.\d+").Value;
 
-            if (Directory.Exists(Program.Config.WorkingDirectory + "\\" + fileName))
+            if (Directory.Exists(Program.Config.Preferences.WorkingDirectory + "\\" + fileName))
                 return fileName;
             
             // Create a new file stream
-            FileStream fileStream = new(Program.Config.WorkingDirectory + "\\" + fileName + ".zip", FileMode.Create);
+            FileStream fileStream = new(Program.Config.Preferences.WorkingDirectory + "\\" + fileName + ".zip", FileMode.Create);
             
             // Copy the response stream to the file stream
             await response.Content.CopyToAsync(fileStream);
@@ -152,12 +160,12 @@ public static class Misc
             
             // Unzip
             Console.WriteLine("Unzipping...");
-            ZipFile.ExtractToDirectory(Program.Config.WorkingDirectory + "\\" + fileName + ".zip", 
-                Program.Config.WorkingDirectory + "\\" + fileName);
+            ZipFile.ExtractToDirectory(Program.Config.Preferences.WorkingDirectory + "\\" + fileName + ".zip", 
+                Program.Config.Preferences.WorkingDirectory + "\\" + fileName);
             Console.WriteLine("Unzipped.");
             
             // Delete the zip file
-            File.Delete(Program.Config.WorkingDirectory + "\\" + fileName + ".zip");
+            File.Delete(Program.Config.Preferences.WorkingDirectory + "\\" + fileName + ".zip");
             
             return fileName;
         }
@@ -174,7 +182,7 @@ public static class Misc
         var nextFunctionAddress = FindNextLowestAddress(symbol)!.Value.Address;
             
         // Load the exe into a byte array
-        var exeBytes = File.ReadAllBytes(Program.Config.ExeFile!);
+        var exeBytes = File.ReadAllBytes(Program.Config.Preferences.ExeFile!);
             
         // Get the offset of the section
         var sectionOffset = int.Parse(section.FilePointerToRawData, System.Globalization.NumberStyles.HexNumber);

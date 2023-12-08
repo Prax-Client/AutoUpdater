@@ -10,7 +10,7 @@ public static class Update
     {
         Dictionary<string, int> offsets = new();
         
-        foreach (var item in config.UpdateItems)
+        foreach (var item in config.SDK.Items)
         {
             
             // try
