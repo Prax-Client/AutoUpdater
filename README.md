@@ -1,3 +1,6 @@
+# NOTICE
+As of August 13, 2024 (1.21.20), Mojang has officially stopped releasing BDS with symbols, making this tool useless.
+
 # AutoUpdater
 
 ## Overview
